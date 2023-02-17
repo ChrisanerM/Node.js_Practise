@@ -1,6 +1,8 @@
  const express = require("express");
 //path
 const path = require("path");
+//cors
+const cors= require('cors')
 //db
 const db = require("./config");
 //body-parser CONVERTS TEST DATA/ANY FORM OF DATA FROM THE USER TO JSON
@@ -11,13 +13,24 @@ const port = parseInt(process.env.port) || 4000;
 const app = express();
 //Router
 const route = express.Router();
-
-app.use(route, express.json, bodyParser.urlencoded({ extended: false }));
-
-//Home or /
-route.get("/", (req, res) => {
+//Middleware
+const{errorHandling}=require('./middleware/ErrorHandling');
+//Message
+const{message}=require('./middleware/message');
+//Home or / ^/$|cmbookstore
+route.get("^/$|cmbookstore",(req, res) => {
   res.status(200).sendFile(path.join(__dirname, "./view/index.html"));
 });
+
+
+
+app.use(
+  route,
+  cors({
+    origin:['http://127.0.0.1','http://localhost:8080'],
+    credentials:true
+  }),
+  express.json, bodyParser.urlencoded({ extended: false }));
 
 //Retrieve all users
 route.get("/users", (req, res) => {
